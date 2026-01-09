@@ -1,3 +1,37 @@
+<#
+.SYNOPSIS
+    Clears CSV files from the Sitecore App_Data/packages directory on a remote server.
+
+.DESCRIPTION
+    This script connects to a remote Sitecore server, lists all CSV files in the App_Data/packages directory,
+    and allows the user to select files to delete. The user can choose specific files by their index or delete all files.
+    The script uses remote PowerShell sessions and custom helper functions for session management and remote execution.
+
+.NOTES
+    - Requires the Get-SitecoreSession.ps1 script in the same directory for session management.
+    - Uses Invoke-RemoteScript for executing commands on the remote server.
+    - Designed for Sitecore environments hosted on Windows/IIS.
+
+.PARAMETER Session
+    The remote PowerShell session object used for executing commands on the Sitecore server.
+
+.PARAMETER RemotePath
+    The full path of the remote file to be deleted.
+
+.FUNCTIONS
+    Get-RemoteCsvFiles
+        Retrieves a list of CSV files from the remote Sitecore App_Data/packages directory.
+
+    Remove-RemoteFile
+        Deletes a specified file from the remote server and provides feedback on the operation.
+
+.EXAMPLE
+    # Run the script to list and delete CSV files from the remote Sitecore server.
+    .\Clear-sitecore-App_Data-contents.ps1
+
+.LINK
+    https://doc.sitecore.com/
+#>
 Clear-Host
 
 # Dot-source the Get-SitecoreSession function so it is available
