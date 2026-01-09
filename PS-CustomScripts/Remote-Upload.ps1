@@ -1,15 +1,40 @@
-﻿# get the folder containing csv files in the media library
-# https://xmc-chartwellma83cf-chartwellsxa-cwprod.sitecorecloud.io/
-# https://xmc-chartwellmabc8a-chartwellsxa-cwqa.sitecorecloud.io/
-# https://xmc-chartwellmaa139-chartwellsxa-dev.sitecorecloud.io/
+﻿<#
+.SYNOPSIS
+    Exports CSV files from Sitecore Media Library to a remote sitecore env packages directory.
+
+.DESCRIPTION
+    This script connects to a Sitecore instance using SPE (Sitecore PowerShell Extensions), locates CSV files in a specified media library folder, reads their contents, decodes them from UTF-8 (removing BOM if present), converts them to PowerShell objects, and exports them as CSV files to a local directory. The script ensures file extensions are handled correctly and provides verbose output for each exported file.
+
+.PARAMETER None
+    All required parameters are retrieved from the Sitecore session information.
+
+.NOTES
+    - Requires SPE module and a valid Sitecore session.
+    - The target media library folder is: master:/sitecore/media library/project/sxastarter/sxastarter/files/upload
+    - Only media items with the "file" template and "csv" extension are processed.
+    - Output files are saved in the directory specified by $sitecoreInfo.PackageDir.
+
+.EXAMPLE
+    .\Remote-Upload.ps1
+    # Exports all CSV files from the specified Sitecore media library folder to the local package directory.
+
+#>
 Clear-Host
 Import-Module -Name SPE 
-$session = New-ScriptSession -ConnectionUri "https://xmc-chartwellmaa139-chartwellsxa-dev.sitecorecloud.io/" -Username "sitecore\speremoting" -SharedSecret "A345256D29924333A975FC96AFC46DE87B8F0F1B85705283B4F81AD502C3A50A"
+
+. "$PSScriptRoot\Get-SitecoreSession.ps1"
+$sitecoreInfo = Get-SitecoreSession
+
+if (-not $sitecoreInfo) { return }
+
+$session = $sitecoreInfo.Session
+$packageDir = $sitecoreInfo.PackageDir
+
 $results = Invoke-RemoteScript -Session $session -Verbose -ScriptBlock {
-    $backupfolder = get-item -path "master:/sitecore/media library/project/sxastarter/sxastarter/files/test"
+    $filestoUpload = get-item -path "master:/sitecore/media library/project/sxastarter/sxastarter/files/upload"
 
     # filter media items that are csvs
-    $csvitems = get-childitem -path $backupfolder.paths.fullpath | where-object {
+    $csvitems = get-childitem -path $filestoUpload.paths.fullpath | where-object {
         $_.template.name -eq "file" -and $_.fields["extension"].value -eq "csv"
     }
 
@@ -40,13 +65,13 @@ $results = Invoke-RemoteScript -Session $session -Verbose -ScriptBlock {
         # remove extension if already present, then append .csv
         $basename = [system.io.path]::getfilenamewithoutextension($filename)
         # define export path
-        $outputfilepath = join-path -path "c:\inetpub\wwwroot\app_data\packages" -childpath "$basename.csv"
+        $outputfilepath = join-path -path $using:packageDir -childpath "$basename.csv"
 
         # export
         $csv | export-csv -path $outputfilepath -notypeinformation -encoding utf8 -force
 
         write-output "✅ exported $filename to $outputfilepath"
     }
-}
+}-Arguments @{ packageDir = $packageDir }
 $results
 Stop-ScriptSession -Session $session
