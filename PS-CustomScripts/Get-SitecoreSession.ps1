@@ -1,3 +1,34 @@
+<#
+.SYNOPSIS
+    Establishes a Sitecore PowerShell Remoting session for a specified environment and returns session details.
+
+.DESCRIPTION
+    The Get-SitecoreSession function prompts the user to select a Sitecore environment (dev, cwqa, or cwprod), 
+    establishes a remoting session using predefined credentials and connection URIs, and returns a custom object 
+    containing session information, environment details, and output file path for further operations.
+
+.PARAMETER packageDir
+    The directory path where package files are stored. Defaults to 'c:\inetpub\wwwroot\app_data\packages'.
+
+.OUTPUTS
+    PSCustomObject
+        Session        - The established Sitecore PowerShell Remoting session object.
+        Environment    - The selected environment name.
+        EnvMap         - The hashtable containing environment and credential mappings.
+        PackageDir     - The directory path for packages.
+        Url            - The base URL for the selected environment.
+        DateVariables  - Hashtable containing formatted date components.
+        OutputFilePath - The generated output file path for the session.
+
+.EXAMPLE
+    PS> $sessionInfo = Get-SitecoreSession
+    Prompts for environment, establishes a session, and returns session details.
+
+.NOTES
+    - Requires Sitecore PowerShell Remoting modules and appropriate permissions.
+    - Credentials and connection URIs are hardcoded for demonstration purposes.
+    - The function will prompt until a valid environment is entered.
+#>
 function Get-SitecoreSession {
     param(
         [string]$packageDir = 'c:\inetpub\wwwroot\app_data\packages'
