@@ -1,3 +1,25 @@
+<#
+.SYNOPSIS
+    Generates a master list of property items from Sitecore and exports the data to a CSV file.
+
+.DESCRIPTION
+    This script connects to a remote Sitecore instance using SPE (Sitecore PowerShell Extensions), retrieves property items from specified regions and languages, processes their data (including bilingual status, address, URLs, and other fields), and exports the results to a CSV file. It also removes any existing property master list files in the output directory before exporting the new data.
+
+.PARAMETER None
+    All required parameters are retrieved from the Sitecore session information via the imported Get-SitecoreSession.ps1 script.
+
+.NOTES
+    - Requires the SPE module and a valid Sitecore session.
+    - The script is intended to be run locally but executes the main logic remotely on the Sitecore server.
+    - The script handles bilingual properties and generates URLs for both English and French versions as needed.
+    - The output CSV file is saved to the path specified in the Sitecore session information.
+
+.EXAMPLE
+    .\Proprty-Master-List-Optimized.ps1
+
+    Runs the script, connects to Sitecore, retrieves property data, and exports it to a CSV file.
+
+#>
 Clear-Host
 Import-Module -Name SPE
 . "$PSScriptRoot\Get-SitecoreSession.ps1"

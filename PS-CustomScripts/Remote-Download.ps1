@@ -1,3 +1,36 @@
+<#
+.SYNOPSIS
+    Downloads selected CSV files from a remote Sitecore server using SPE Remoting.
+
+.DESCRIPTION
+    This script connects to a remote Sitecore instance using SPE Remoting, lists available CSV files in the 
+    "C:\inetpub\wwwroot\app_data\packages" directory, and allows the user to select and download one or more files 
+    to a local "Downloads" folder. It handles session management, directory creation, and file transfer using 
+    base64 encoding.
+
+.PARAMETER None
+    The script does not accept parameters; it prompts the user for input during execution.
+
+.FUNCTIONS
+    New-Directory
+        Ensures a directory exists at the specified path, creating it if necessary.
+
+    Get-RemoteCsvFiles
+        Retrieves the full paths of all CSV files in the remote packages directory.
+
+    Get-RemoteFile
+        Downloads a specified file from the remote server by encoding it in base64 and saving it locally.
+
+.NOTES
+    - Requires the SPE (Sitecore PowerShell Extensions) module and a helper script "Get-SitecoreSession.ps1".
+    - User must have appropriate permissions on the remote Sitecore server.
+    - The script handles errors gracefully and provides colored output for status messages.
+
+.EXAMPLE
+    .\Remote-Download.ps1
+    # Connects to the remote Sitecore server, lists available CSV files, and downloads selected files to the local "Downloads" folder.
+
+#>
 
 Clear-Host
 Import-Module -Name SPE
