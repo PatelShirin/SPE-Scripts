@@ -47,7 +47,7 @@ This repository contains PowerShell scripts for Sitecore and related automation 
 ## Contributing
 
 - Please document any new scripts and specify prerequisites in the script header.
-- Submit pull requests for improvements or bug fixes.
+- **Submit pull requests for improvements or bug fixes. This is VERY IMPORTANT to ensure the quality and maintainability of these scripts.**
 
 ---
 
