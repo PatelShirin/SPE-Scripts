@@ -1,3 +1,4 @@
+Clear-Host
 # Environment selection
 Import-Module "$PSScriptRoot\..\Get-SitecoreSession.ps1"
 $sitecoreInfo = Get-SitecoreSession
