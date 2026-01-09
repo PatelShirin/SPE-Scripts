@@ -1,3 +1,27 @@
+<#
+.SYNOPSIS
+    Imports data from a specified Excel file, processes it, and exports the result as a CSV file with a structured directory output.
+
+.DESCRIPTION
+    This script allows the user to select or specify an Excel file containing market rate and business case data.
+    It processes the data from a specific worksheet, converts date columns to ISO 8601 format, and exports the cleaned data to a CSV file.
+    The output CSV is saved in a directory structure organized by year and month.
+    The script ensures required modules are installed, handles file and directory creation, and skips export if the output file already exists.
+
+.PARAMETER excelPath
+    The path to the Excel file to import. Can be selected via a file picker on Windows or entered manually.
+
+.NOTES
+    - Requires the ImportExcel PowerShell module.
+    - Designed for use on Windows, but supports manual file path entry on other platforms.
+    - Excludes certain columns ('Customer Promotional Offers', 'Notes:', 'Region') from the output.
+    - Only exports rows where 'PropertyID - Yardi Number' is not null or "TBD".
+
+.EXAMPLE
+    # Run the script and follow prompts to select or enter the Excel file path.
+    .\suite-plan-pricing-excel-file-import.ps1
+
+#>
 Clear-Host
 
 $month = (Get-Date).ToString('MMM').ToUpper()
