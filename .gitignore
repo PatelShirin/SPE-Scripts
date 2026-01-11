@@ -1,1 +1,9 @@
+# Ignore environment files containing secrets
 PS-CustomScripts/.env
+# Ignore all .env files in any subdirectory (optional)
+*.env
+
+# Ignore VS Code workspace settings file
+.DS_Store
+.code-workspace
+.vscode/settings.json
