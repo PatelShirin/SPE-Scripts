@@ -34,6 +34,7 @@
 
 Clear-Host
 Import-Module -Name SPE
+. "$PSScriptRoot\Load-Env.ps1"
 . "$PSScriptRoot\Get-SitecoreSession.ps1"
 
 function New-Directory {
@@ -117,7 +118,6 @@ Write-Host "`nDownloading selected files..." -ForegroundColor Cyan
 foreach ($remotePath in $selectedFiles) {
     $fileName = Split-Path $remotePath -Leaf
     $localPath = Join-Path $downloadFolder $fileName
-    $fileName, $remotePath, $localPath
     Get-RemoteFile -Session $session -RemotePath $remotePath -LocalPath $localPath | Out-Null
 }
 

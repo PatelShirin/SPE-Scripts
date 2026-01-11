@@ -21,7 +21,7 @@
 #>
 Clear-Host
 Import-Module -Name SPE 
-
+. "$PSScriptRoot\Load-Env.ps1"
 . "$PSScriptRoot\Get-SitecoreSession.ps1"
 $sitecoreInfo = Get-SitecoreSession
 
