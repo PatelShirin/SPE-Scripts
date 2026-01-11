@@ -46,10 +46,24 @@ function Get-SitecoreSession {
         Year       = $now.Year
     }
     $envMap = @{
-        "Creds"  = @{ UserName = "sitecore\speremoting"; SharedSecret = "A345256D29924333A975FC96AFC46DE87B8F0F1B85705283B4F81AD502C3A50A" }
-        "dev"    = @{ url = "https://dev.chartwell.com"; connectionUri = "https://xmc-chartwellmaa139-chartwellsxa-dev.sitecorecloud.io/" }
-        "cwqa"   = @{ url = "https://cwqa.chartwell.com"; connectionUri = "https://xmc-chartwellmabc8a-chartwellsxa-cwqa.sitecorecloud.io/" }
-        "cwprod" = @{ url = "https://chartwell.com"; connectionUri = "https://xmc-chartwellma83cf-chartwellsxa-cwprod.sitecorecloud.io/" }
+        "dev"    = @{ 
+            url           = "https://dev.chartwell.com"
+            connectionUri = if ($env:SITECORE_URI_DEV) { $env:SITECORE_URI_DEV } else { "https://xmc-chartwellmaa139-chartwellsxa-dev.sitecorecloud.io/" }
+        }
+        "cwqa"   = @{ 
+            url           = "https://cwqa.chartwell.com"
+            connectionUri = if ($env:SITECORE_URI_CWQA) { $env:SITECORE_URI_CWQA } else { "https://xmc-chartwellmabc8a-chartwellsxa-cwqa.sitecorecloud.io/" }
+        }
+        "cwprod" = @{ 
+            url           = "https://chartwell.com"
+            connectionUri = if ($env:SITECORE_URI_CWPROD) { $env:SITECORE_URI_CWPROD } else { "https://xmc-chartwellma83cf-chartwellsxa-cwprod.sitecorecloud.io/" }
+        }
+    }
+
+    $sitecoreUser = $env:SITECORE_USER
+    $sitecoreSecret = $env:SITECORE_SECRET
+    if ([string]::IsNullOrWhiteSpace($sitecoreUser) -or [string]::IsNullOrWhiteSpace($sitecoreSecret)) {
+        throw "Environment variables SITECORE_USER and SITECORE_SECRET must be set."
     }
 
 
@@ -71,15 +85,14 @@ function Get-SitecoreSession {
 
     $connectionUri = $envMap[$sitecoreEnv].connectionUri
     $session = New-ScriptSession -ConnectionUri $connectionUri `
-        -Username $envMap["Creds"].UserName `
-        -SharedSecret $envMap["Creds"].SharedSecret 
+        -Username $sitecoreUser `
+        -SharedSecret $sitecoreSecret
 
     Write-Host "session connected to: $($session.Connection.Uri)" -ForegroundColor Green  
 
     return [PSCustomObject]@{
         Session        = $session
         Environment    = $sitecoreEnv
-        EnvMap         = $envMap
         PackageDir     = $packageDir
         Url            = $envMap[$sitecoreEnv].url
         DateVariables  = $dateVariables

@@ -34,6 +34,9 @@
 #>
 Clear-Host
 
+# Dot-source the Load-Env script so it is available
+. "$PSScriptRoot\Load-Env.ps1"
+
 # Dot-source the Get-SitecoreSession function so it is available
 . "$PSScriptRoot\Get-SitecoreSession.ps1"
 function Get-RemoteCsvFiles {

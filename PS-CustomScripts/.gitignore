@@ -1,1 +1,3 @@
-downloads
+# Ignore files in downloads folder, but not the folder itself
+/downloads/*
+/downloads/**/

@@ -1,4 +1,6 @@
 # Dot-source the Get-SitecoreSession function so it is available
+. "$PSScriptRoot\..\Load-Env.ps1"
+
 . "$PSScriptRoot\..\Get-SitecoreSession.ps1"
 #Clear-Host
 if ($null -ne $session) {
@@ -15,10 +17,10 @@ Write-Output "Running remote script to update suite plans pricing - $($sitecoreS
 $envKey = ""
 $propertyMasterCsv = ""
 $suitePricingCsv = ""
-if ($session.Connection.Uri -match "chartwellsxa-dev") { $envKey = "dev" }
-elseif ($session.Connection.Uri -match "chartwellsxa-cwqa") { $envKey = "cwqa" }
-elseif ($session.Connection.Uri -match "chartwellsxa-cwprod") { $envKey = "cwprod" }
-if ($sitecoreSessionInfo.EnvMap.ContainsKey($envKey)) {
+if ($session.Connection.Uri.OriginalString -match "chartwellsxa-dev") { $envKey = "dev" }
+elseif ($session.Connection.Uri.OriginalString -match "chartwellsxa-cwqa") { $envKey = "cwqa" }
+elseif ($session.Connection.Uri.OriginalString -match "chartwellsxa-cwprod") { $envKey = "cwprod" }
+if ($sitecoreSessionInfo.Environment -eq $envKey) {
     $propertyMasterCsv = $sitecoreSessionInfo.OutputFilePath
     $fileName = Get-ChildItem -Path "$PSScriptRoot\export\$($sitecoreSessionInfo.DateVariables.Year)\$($sitecoreSessionInfo.DateVariables.ShortMonth.ToUpper())" -Filter "*.csv" | Select-Object -First 1 | ForEach-Object { $_.Name }    
     $suitePricingCsv = Join-Path -Path $PSScriptRoot -ChildPath "export" -AdditionalChildPath $sitecoreSessionInfo.DateVariables.Year, $sitecoreSessionInfo.DateVariables.ShortMonth.ToUpper(), ("$fileName")

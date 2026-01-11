@@ -19,7 +19,7 @@ The monthly update process ensures that suite pricing data is refreshed and expo
 
    - Open PowerShell and navigate to this folder:
      ```powershell
-     cd "<path-to-repo>\\SPE-Scripts\\PS-CustomScripts\\suite-pricing"
+     cd "~\repos\azure\automation\SPE\PS-CustomScripts\suite-pricing"
      ```
    - Run the import script:
      ```powershell

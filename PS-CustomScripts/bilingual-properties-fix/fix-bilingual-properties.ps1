@@ -28,6 +28,8 @@
 #>
 Clear-Host
 # Environment selection
+. "$PSScriptRoot\..\Load-Env.ps1"
+
 Import-Module "$PSScriptRoot\..\Get-SitecoreSession.ps1"
 $sitecoreInfo = Get-SitecoreSession
 if (-not $sitecoreInfo) { return }
