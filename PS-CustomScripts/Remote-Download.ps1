@@ -39,7 +39,17 @@ Import-Module -Name SPE
 
 function New-Directory {
     param([string]$Path)
-    if (-not (Test-Path $Path)) {
+    # Normalize path for case-insensitive comparison
+    $parent = Split-Path $Path -Parent
+    $targetName = Split-Path $Path -Leaf
+    $exists = $false
+    if (Test-Path $parent) {
+        $dirs = Get-ChildItem -Path $parent -Directory | Where-Object { $_.Name.ToLower() -eq $targetName.ToLower() }
+        if ($dirs) {
+            $exists = $true
+        }
+    }
+    if (-not $exists -and -not (Test-Path $Path)) {
         New-Item -ItemType Directory -Path $Path | Out-Null
     }
 }
