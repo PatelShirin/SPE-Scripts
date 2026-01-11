@@ -13,6 +13,7 @@ if (Test-Path $envFile) {
         }
     }
     Write-Host ".env variables loaded into session." -ForegroundColor Green
-} else {
+}
+else {
     Write-Host ".env file not found in script directory." -ForegroundColor Yellow
 }
