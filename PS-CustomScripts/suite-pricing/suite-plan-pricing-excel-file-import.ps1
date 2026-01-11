@@ -1,6 +1,6 @@
 Clear-Host
 
-$month = (Get-Date).ToString('MMM').ToUpper()
+$month = (Get-Date).ToString('MMM').Substring(0, 1).ToUpper() + (Get-Date).ToString('MMM').Substring(1).ToLower()
 $year = (Get-Date).Year
 
 # Excel file selection
