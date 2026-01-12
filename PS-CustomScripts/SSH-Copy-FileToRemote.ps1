@@ -1,159 +1,93 @@
 . "$PSScriptRoot\Load-Env.ps1"
 
-
-# Prompt for directory path, using env as default if available, and auto-select the only file
 function Get-LocalFilePath {
     param([string]$defaultDir)
     while ($true) {
-        if ($defaultDir) {
-            $inputDir = Read-Host "Enter directory path to select file from [$HOME\$defaultDir]"
-            if ([string]::IsNullOrWhiteSpace($inputDir)) {
-                $dirPath = "$HOME\$defaultDir"
-
-            }
-            else {
-                $dirPath = Read-Host "Enter directory path to select file from"
-            }
-            if ([string]::IsNullOrWhiteSpace($dirPath) -or -not (Test-Path $dirPath) -or -not (Get-Item $dirPath).PSIsContainer) {
-                Write-Warning "Please enter a valid directory path."
-                continue
-            }
-            # Get files in directory
-            $files = Get-ChildItem -Path $dirPath -File
-            if ($files.Count -eq 0) {
-                Write-Warning "No files found in directory. Please choose another directory."
-                continue
-            }
-            elseif ($files.Count -gt 1) {
-                Write-Warning "More than one file found in directory. Please ensure only one file is present."
-                continue
-            }
-            return $files[0].FullName
+        $promptDir = if ($defaultDir) { "$HOME\$defaultDir" } else { "" }
+        $inputDir = Read-Host "Enter directory path to select file from [$promptDir]"
+        $dirPath = if ([string]::IsNullOrWhiteSpace($inputDir) -and $defaultDir) { "$HOME\$defaultDir" } else { $inputDir }
+        if ([string]::IsNullOrWhiteSpace($dirPath) -or -not (Test-Path $dirPath) -or -not (Get-Item $dirPath).PSIsContainer) {
+            Write-Warning "Please enter a valid directory path."
+            continue
         }
+        $files = Get-ChildItem -Path $dirPath -File
+        if ($files.Count -eq 0) {
+            Write-Warning "No files found in directory. Please choose another directory."
+            continue
+        }
+        if ($files.Count -gt 1) {
+            Write-Warning "More than one file found in directory. Please ensure only one file is present."
+            continue
+        }
+        return $files[0].FullName
     }
 }
+
+function Get-RemoteValue {
+    param(
+        [string]$envVar,
+        [string]$prompt,
+        [string]$default
+    )
+    if ($envVar) {
+        $userInput = Read-Host "$prompt [$envVar]"
+        if ([string]::IsNullOrWhiteSpace($userInput)) {
+            return $envVar
+        }
+        else {
+            return $userInput
+        }
+    }
+    elseif ($default) {
+        $userInput = Read-Host "$prompt [$default]"
+        if ([string]::IsNullOrWhiteSpace($userInput)) {
+            return $default
+        }
+        else {
+            return $userInput
+        }
+    }
+    else {
+        return Read-Host $prompt
+    }
+}
+
 $localFilePath = Get-LocalFilePath $env:LOCAL_UPLOAD_FILE_PATH
-
-# Function to prompt for directory, list files, and prompt for file name
-# function Get-ValidLocalFilePathFromDir {
-#     param([string]$defaultDir)
-#     while ($true) {
-#         if ($defaultDir) {
-#             $inputDir = Read-Host "Enter directory path to select file from [$defaultDir]"
-#             if ([string]::IsNullOrWhiteSpace($inputDir)) {
-#                 $dirPath = $defaultDir
-#             }
-#             else {
-#                 $dirPath = $inputDir
-#             }
-#         }
-#         else {
-#             $dirPath = Read-Host "Enter directory path to select file from"
-#         }
-#         if ([string]::IsNullOrWhiteSpace($dirPath) -or -not (Test-Path $dirPath) -or -not (Get-Item $dirPath).PSIsContainer) {
-#             Write-Warning "Please enter a valid directory path."
-#             continue
-#         }
-#     }
-# }
-        
-# $localFilePath = Get-LocalFilePath $env:LOCAL_WINDOWS_FILES_PATH
-
 
 # Ensure the local file path has .xlsx extension if missing
 if (-not ([System.IO.Path]::GetExtension($localFilePath))) {
     $localFilePath += ".xlsx"
 }
 
-# Get the local file name and append it to $localFilePath if not already present
 $localFileName = $localFilePath | Split-Path -Leaf
 if (-not ($localFilePath -like "*$localFileName")) {
     if ($localFilePath -notmatch '[\\/]$') {
-        if ($localFilePath -match '^[a-zA-Z]:') {
-            $localFilePath += '\'
-        }
-        else {
-            $localFilePath += '/'
-        }
+        $localFilePath += ($localFilePath -match '^[a-zA-Z]:') ? '\' : '/'
     }
     $localFilePath += $localFileName
 }
 
+$remoteUser = Get-RemoteValue $env:REMOTE_SSH_USERNAME "Enter remote SSH username" ""
+$remoteHost = Get-RemoteValue $env:REMOTE_SSH_HOST "Enter remote SSH host (e.g., example.com / remote.ip.address)" ""
+$remotePort = Get-RemoteValue $env:REMOTE_SSH_PORT "Enter remote SSH port (default 22)" "22"
 
-# Use environment variables as defaults for SSH details
-$defaultRemoteUser = $env:REMOTE_SSH_USERNAME
-$defaultRemoteHost = $env:REMOTE_SSH_HOST
-$defaultRemotePort = $env:REMOTE_SSH_PORT
-
-# Prompt for remote SSH details, using defaults if available
-if ($defaultRemoteUser) {
-    $remoteUser = Read-Host "Enter remote SSH username [$defaultRemoteUser]"
-    if ([string]::IsNullOrWhiteSpace($remoteUser)) { $remoteUser = $defaultRemoteUser }
-}
-else {
-    $remoteUser = Read-Host "Enter remote SSH username"
-}
-
-if ($defaultRemoteHost) {
-    $remoteHost = Read-Host "Enter remote SSH host (e.g., example.com / remote.ip.address) [$defaultRemoteHost]"
-    if ([string]::IsNullOrWhiteSpace($remoteHost)) { $remoteHost = $defaultRemoteHost }
-}
-else {
-    $remoteHost = Read-Host "Enter remote SSH host (e.g., example.com / remote.ip.address)"
-}
-
-if ($defaultRemotePort) {
-    $remotePort = Read-Host "Enter remote SSH port (default 22) [$defaultRemotePort]"
-    if ([string]::IsNullOrWhiteSpace($remotePort)) { $remotePort = $defaultRemotePort }
-}
-else {
-    $remotePort = Read-Host "Enter remote SSH port (default 22)"
-    if ([string]::IsNullOrWhiteSpace($remotePort)) { $remotePort = 22 }
-}
 $fileName = $localFilePath | Split-Path -Leaf
 Write-Host $fileName $env:REMOTE_SSH_DESTINATION_PATH -ForegroundColor Green
 
-#[string]$remotePath = Read-Host "Enter remote destination directory (e.g., $env:REMOTE_SSH_DESTINATION_PATH) where file will be copied to"
-# Prompt for remote destination directory, using env as default if available
-if ($env:REMOTE_SSH_DESTINATION_PATH) {
-    $remotePathInput = Read-Host "Enter remote destination directory where file will be copied to [$env:REMOTE_SSH_DESTINATION_PATH]"
-    if ([string]::IsNullOrWhiteSpace($remotePathInput)) {
-        $remotePath = $env:REMOTE_SSH_DESTINATION_PATH
-    }
-    else {
-        $remotePath = $remotePathInput
-    }
-}
-else {
-    $remotePath = Read-Host "Enter remote destination directory where file will be copied to"
-}
-# Ensure remotePath ends with a separator
+$remotePath = Get-RemoteValue $env:REMOTE_SSH_DESTINATION_PATH "Enter remote destination directory where file will be copied to" ""
 if ($remotePath -notmatch '[\\/]$') {
-    if ($remotePath -match '^[a-zA-Z]:') {
-        $remotePath += '\'
-    }
-    else {
-        $remotePath += '/'
-    }
+    $remotePath += ($remotePath -match '^[a-zA-Z]:') ? '\' : '/'
 }
-# Append fileName if not already present
 if (-not ($remotePath -like "*$fileName")) {
     $remotePath += $fileName
 }
 
-# Ensure remote directory exists before copying
 $remoteDir = [System.IO.Path]::GetDirectoryName($remotePath)
 if ($null -ne $remoteDir -and $remoteDir -ne '' -and $remoteDir -ne '/' -and $remoteDir -ne '\\') {
-    if ($remoteDir -match '^[a-zA-Z]:') {
-        # Windows path: use backslashes and wrap in double quotes
-        $remoteDirWin = $remoteDir -replace '/', '\'
-        $sshMkdirCommand = 'ssh -p ' + $remotePort + ' ' + $remoteUser + '@' + $remoteHost + ' mkdir "' + $remoteDirWin + '"'
-    }
-    else {
-        # Linux/Unix path: use forward slashes and -p
-        $remoteDirUnix = $remoteDir -replace '\\', '/'
-        $sshMkdirCommand = 'ssh -p ' + $remotePort + ' ' + $remoteUser + '@' + $remoteHost + ' mkdir -p ' + $remoteDirUnix
-    }
+    $isWindowsPath = $remoteDir -match '^[a-zA-Z]:'
+    $remoteDirFinal = $isWindowsPath ? ($remoteDir -replace '/', '\') : ($remoteDir -replace '\\', '/')
+    $mkdirCmd = $isWindowsPath ? "mkdir `"$remoteDirFinal`"" : "mkdir -p $remoteDirFinal"
+    $sshMkdirCommand = "ssh -p $remotePort $remoteUser@$remoteHost $mkdirCmd"
     Write-Host "Ensuring remote directory exists using: $sshMkdirCommand"
     try {
         & $env:COMSPEC /c $sshMkdirCommand
@@ -166,7 +100,8 @@ if ($null -ne $remoteDir -and $remoteDir -ne '' -and $remoteDir -ne '/' -and $re
 else {
     Write-Host "No remote directory to create or directory is root. Skipping mkdir."
 }
-$scpCommand = 'scp -P ' + $remotePort + ' "' + $localFilePath + '" ' + $remoteUser + '@' + $remoteHost + ':' + '"' + $remotePath + '"'
+
+$scpCommand = "scp -P $remotePort `"$localFilePath`" $remoteUser@${remoteHost}:`"${remotePath}`""
 Write-Host "Copying file to remote server using: $scpCommand"
 try {
     & $env:COMSPEC /c $scpCommand
