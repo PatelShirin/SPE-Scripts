@@ -39,7 +39,7 @@ Import-Module -Name SPE
 
 function New-Directory {
     param([string]$Path)
-    # Normalize path for case-insensitive comparison
+    # Normalize path for case-insensitive comparison.
     $parent = Split-Path $Path -Parent
     $targetName = Split-Path $Path -Leaf
     $exists = $false
