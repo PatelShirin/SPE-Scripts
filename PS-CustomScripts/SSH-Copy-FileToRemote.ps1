@@ -54,9 +54,18 @@ function Get-RemoteValue {
 
 $localFilePath = Get-LocalFilePath $env:LOCAL_UPLOAD_FILE_PATH
 
-# Ensure the local file path has .xlsx extension if missing
+# # Ensure the local file path has .xlsx extension if missing
+# if (-not ([System.IO.Path]::GetExtension($localFilePath))) {
+#     $localFilePath += ".xlsx"
+# }
+
+# Ensure the local file path has an extension; if missing, prompt user for one
 if (-not ([System.IO.Path]::GetExtension($localFilePath))) {
-    $localFilePath += ".xlsx"
+    $extension = Read-Host "No file extension detected. Please enter the file extension (e.g., .txt, .csv, .xlsx)"
+    if ($extension -and $extension -notmatch '^\.') {
+        $extension = ".$extension"
+    }
+    $localFilePath += $extension
 }
 
 $localFileName = $localFilePath | Split-Path -Leaf
