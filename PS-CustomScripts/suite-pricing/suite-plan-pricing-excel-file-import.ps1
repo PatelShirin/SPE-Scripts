@@ -14,6 +14,12 @@ if ($IsWindows) {
         $openFileDialog.Title = "Select the Excel file to import"
         if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
             $excelPath = $openFileDialog.FileName
+            # Copy the selected file to $defaultExcelPath
+            $defaultExcelPath = Join-Path $PSScriptRoot "excel\$year\$month\$year Market Rate & Business Case Tracker (C2C & Web).xlsx"
+            if ($excelPath -ne $defaultExcelPath) {
+                Write-Host "Copying $excelPath to $defaultExcelPath ..."
+                Copy-Item -Path $excelPath -Destination $defaultExcelPath -Force
+            }
         }
         else {
             Write-Host "No file selected. Exiting."
