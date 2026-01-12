@@ -18,6 +18,11 @@ if ($IsWindows) {
             $defaultExcelPath = Join-Path $PSScriptRoot "excel\$year\$month\$year Market Rate & Business Case Tracker (C2C & Web).xlsx"
             if ($excelPath -ne $defaultExcelPath) {
                 Write-Host "Copying $excelPath to $defaultExcelPath ..."
+                $destDir = Split-Path $defaultExcelPath -Parent
+                if (-not (Test-Path $destDir)) {
+                    Write-Host "Creating directory $destDir ..."
+                    New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+                }
                 Copy-Item -Path $excelPath -Destination $defaultExcelPath -Force
             }
         }
