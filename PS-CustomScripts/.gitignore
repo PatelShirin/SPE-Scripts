@@ -1,3 +1,9 @@
 # Ignore files in downloads folder, but not the folder itself
 /downloads/*
 /downloads/**/
+/Downloads/*
+/Downloads/**/
+
+# Ignore all files in excel and export folders under suite-pricing
+suite-pricing/excel/**
+suite-pricing/export/**
