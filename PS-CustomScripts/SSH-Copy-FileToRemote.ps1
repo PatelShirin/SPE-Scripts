@@ -6,9 +6,9 @@ function Get-LocalFilePath {
     param([string]$defaultDir)
     while ($true) {
         if ($defaultDir) {
-            $inputDir = Read-Host "Enter directory path to select file from [$defaultDir]"
+            $inputDir = Read-Host "Enter directory path to select file from [$HOME\$defaultDir]"
             if ([string]::IsNullOrWhiteSpace($inputDir)) {
-                $dirPath = $defaultDir
+                $dirPath = "$HOME\$defaultDir"
 
             }
             else {
@@ -111,8 +111,22 @@ else {
     if ([string]::IsNullOrWhiteSpace($remotePort)) { $remotePort = 22 }
 }
 $fileName = $localFilePath | Split-Path -Leaf
-Write-Host $fileName -ForegroundColor Green
-[string]$remotePath = Read-Host "Enter remote destination directory (e.g., c:/Users/shirin/repos/git-repos/personal-git-repo/SPE-Scripts/PS-CustomScripts/suite-pricing/excel/2026/Jan/)"
+Write-Host $fileName $env:REMOTE_SSH_DESTINATION_PATH -ForegroundColor Green
+
+#[string]$remotePath = Read-Host "Enter remote destination directory (e.g., $env:REMOTE_SSH_DESTINATION_PATH) where file will be copied to"
+# Prompt for remote destination directory, using env as default if available
+if ($env:REMOTE_SSH_DESTINATION_PATH) {
+    $remotePathInput = Read-Host "Enter remote destination directory where file will be copied to [$env:REMOTE_SSH_DESTINATION_PATH]"
+    if ([string]::IsNullOrWhiteSpace($remotePathInput)) {
+        $remotePath = $env:REMOTE_SSH_DESTINATION_PATH
+    }
+    else {
+        $remotePath = $remotePathInput
+    }
+}
+else {
+    $remotePath = Read-Host "Enter remote destination directory where file will be copied to"
+}
 # Ensure remotePath ends with a separator
 if ($remotePath -notmatch '[\\/]$') {
     if ($remotePath -match '^[a-zA-Z]:') {
