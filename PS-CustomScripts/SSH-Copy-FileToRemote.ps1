@@ -32,7 +32,7 @@ function Get-LocalFilePath {
         }
     }
 }
-$localFilePath = Get-LocalFilePath $env:LOCAL_WINDOWS_UPLOAD_FILE_PATH
+$localFilePath = Get-LocalFilePath $env:LOCAL_UPLOAD_FILE_PATH
 
 # Function to prompt for directory, list files, and prompt for file name
 # function Get-ValidLocalFilePathFromDir {
