@@ -1,4 +1,5 @@
 Clear-Host
+. "$PSScriptRoot\..\Load-Env.ps1"
 
 $month = (Get-Date).ToString('MMM').Substring(0, 1).ToUpper() + (Get-Date).ToString('MMM').Substring(1).ToLower()
 $year = (Get-Date).Year
@@ -9,11 +10,30 @@ if ($IsWindows) {
     try {
         Add-Type -AssemblyName System.Windows.Forms
         $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
-        $openFileDialog.InitialDirectory = "$HOME/repos/rm-local/PS-CustomScripts"
+        $openFileDialog.InitialDirectory = "$HOME\$env:LOCAL_UPLOAD_FILE_PATH"
         $openFileDialog.Filter = "Excel Files (*.xlsx)|*.xlsx|All Files (*.*)|*.*"
         $openFileDialog.Title = "Select the Excel file to import"
         if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
             $excelPath = $openFileDialog.FileName
+            $fileName = Split-Path $excelPath -Leaf
+            Write-Host ("Selected file: " + (Split-Path $excelPath -Leaf)) -ForegroundColor Green
+            # Copy the selected file to $defaultExcelPath
+            $defaultExcelPath = Join-Path $PSScriptRoot "excel\$year\$month\$fileName"
+            if ($excelPath -ne $defaultExcelPath) {
+                Write-Host "Copying $excelPath to $defaultExcelPath ..."
+                $destDir = Split-Path $defaultExcelPath -Parent
+                if (-not (Test-Path $destDir)) {
+                    Write-Host "Creating directory $destDir ..."
+                    New-Item -ItemType Directory -Path $destDir -Force | Out-Null
+                }
+                Copy-Item -Path $excelPath -Destination $defaultExcelPath -Force
+                # Prompt for remote SSH details
+                # $copyRemote = Read-Host "Do you want to copy the file to a remote server via SSH? (y/n)"
+                # if ($copyRemote -eq 'y') {
+                #     $copyScript = Join-Path $PSScriptRoot '..\SSH-Copy-FileToRemote.ps1'
+                #     & $copyScript #-localFilePath $defaultExcelPath
+                # }
+            }
         }
         else {
             Write-Host "No file selected. Exiting."
