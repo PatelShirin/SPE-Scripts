@@ -14,8 +14,10 @@ if ($IsWindows) {
         $openFileDialog.Title = "Select the Excel file to import"
         if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
             $excelPath = $openFileDialog.FileName
+            $fileName = Split-Path $excelPath -Leaf
+            Write-Host ("Selected file: " + (Split-Path $excelPath -Leaf)) -ForegroundColor Green
             # Copy the selected file to $defaultExcelPath
-            $defaultExcelPath = Join-Path $PSScriptRoot "excel\$year\$month\$year Market Rate & Business Case Tracker (C2C & Web).xlsx"
+            $defaultExcelPath = Join-Path $PSScriptRoot "excel\$year\$month\$fileName"
             if ($excelPath -ne $defaultExcelPath) {
                 Write-Host "Copying $excelPath to $defaultExcelPath ..."
                 $destDir = Split-Path $defaultExcelPath -Parent
@@ -24,6 +26,12 @@ if ($IsWindows) {
                     New-Item -ItemType Directory -Path $destDir -Force | Out-Null
                 }
                 Copy-Item -Path $excelPath -Destination $defaultExcelPath -Force
+                # Prompt for remote SSH details
+                $copyRemote = Read-Host "Do you want to copy the file to a remote server via SSH? (y/n)"
+                if ($copyRemote -eq 'y') {
+                    $copyScript = Join-Path $PSScriptRoot '..\Copy-FileToRemote.ps1'
+                    & $copyScript -localFilePath $defaultExcelPath
+                }
             }
         }
         else {
