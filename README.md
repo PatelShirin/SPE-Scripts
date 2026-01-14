@@ -1,4 +1,4 @@
-# SPE-Scripts Usage Guide
+# SPE-Scripts Usage Guide.
 
 This repository contains PowerShell scripts for Sitecore and related automation tasks. Follow these steps to ensure you can run the scripts successfully as a first-time user:
 
@@ -50,5 +50,6 @@ This repository contains PowerShell scripts for Sitecore and related automation 
 - **Submit pull requests for improvements or bug fixes. This is VERY IMPORTANT to ensure the quality and maintainability of these scripts.**
 
 ---
+
 
 For further help, contact the repository maintainer or refer to the script comments.
