@@ -13,7 +13,7 @@ This repository contains PowerShell scripts for Sitecore and related automation 
      ```powershell
      Set-ExecutionPolicy RemoteSigned
      ```
-   - This allows local scripts to run and requires remote scripts to be signed.
+   - This allows local scripts to run and requires remote scripts to be signed
 
 3. **Required Modules**
    - Some scripts may require additional modules (e.g., Sitecore PowerShell Extensions, PnP.PowerShell, etc.).
