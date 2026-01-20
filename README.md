@@ -5,7 +5,7 @@ This repository contains PowerShell scripts for Sitecore and related automation 
 ## Prerequisites
 
 1. **PowerShell**
-   - Ensure you have PowerShell 5.1 or later installed on your system
+   - Ensure you have PowerShell 5.1 or later installed on your system.
    - On Windows, PowerShell is included by default. For other platforms, download from [Microsoft PowerShell](https://github.com/PowerShell/PowerShell).
 
 2. **Execution Policy**
