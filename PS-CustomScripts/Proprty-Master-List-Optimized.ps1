@@ -18,8 +18,8 @@
     .\Proprty-Master-List-Optimized.ps1
 
     Runs the script, connects to Sitecore, retrieves property data, and exports it to a CSV file.
-
 #>
+
 Clear-Host
 Import-Module -Name SPE
 . "$PSScriptRoot\Load-Env.ps1"
